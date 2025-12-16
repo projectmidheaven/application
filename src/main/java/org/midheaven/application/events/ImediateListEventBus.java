@@ -19,8 +19,9 @@ public class ImediateListEventBus implements EventBus{
         this.handler = handler;
     }
     
-    public void addListener(EventListener eventListener){
+    public ImediateListEventBus addListener(EventListener eventListener){
         this.listeners.add(eventListener);
+        return this;
     }
     
     @Override
