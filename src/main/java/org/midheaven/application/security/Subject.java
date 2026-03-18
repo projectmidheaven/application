@@ -11,7 +11,7 @@ public sealed abstract class Subject permits PermitedSubject {
     public abstract boolean hasPermission(@NotNullable Permission permission);
     
     public <I extends SubjectIdentity> Maybe<I> identityAs(@NotNullable Class<I> subjectIdentityType){
-        Check.argumentIsNotNull("subjectIdentityType", subjectIdentityType);
+        Check.argumentIsNotNull(subjectIdentityType);
         return Maybe.of(identity())
                    .filter(subjectIdentityType::isInstance)
                    .map(subjectIdentityType::cast);

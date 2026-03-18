@@ -1,12 +1,9 @@
-package org.midheaven.application;
+package org.midheaven.application.events;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.midheaven.application.events.AbstractTypedEventListener;
-import org.midheaven.application.events.Event;
-import org.midheaven.application.events.ImediateListEventBus;
 
 import java.time.LocalDateTime;
 
