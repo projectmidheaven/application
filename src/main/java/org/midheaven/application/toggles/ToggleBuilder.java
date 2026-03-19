@@ -15,11 +15,11 @@ public class ToggleBuilder {
     }
     
     public Toggle active(){
-        return new BuildToggle(name, level, true);
+        return ToggleRegistry.register(new BuildToggle(name, level, true));
     }
     
     public Toggle inactive(){
-        return new BuildToggle(name, level, false);
+        return ToggleRegistry.register(new BuildToggle(name, level, false));
     }
 }
 
