@@ -11,19 +11,19 @@ final class HashPermissionSet implements PermissionSet {
 
     HashPermissionSet(){}
 
-    HashPermissionSet(Iterable<org.midheaven.application.security.permission.Permission> other){
+    HashPermissionSet(Iterable<Permission> other){
         for ( var p : other){
             this.addPermission(p);
         }
     }
 
-    HashPermissionSet(org.midheaven.application.security.permission.Permission... permissions){
+    HashPermissionSet(Permission... permissions){
         for ( var p : permissions){
             this.addPermission(p);
         }
     }
     @Override
-    public org.midheaven.application.security.permission.Permission reduce() {
+    public Permission reduce() {
         if (permissions.count().isOne()){
             return permissions.first().orElseThrow();
         }
@@ -36,8 +36,8 @@ final class HashPermissionSet implements PermissionSet {
     }
 
     @Override
-    public boolean implies(org.midheaven.application.security.permission.Permission other) {
-        if (other instanceof org.midheaven.application.security.permission.PermissionSet set){
+    public boolean implies(Permission other) {
+        if (other instanceof PermissionSet set){
             // a set implies another set if all other permissions in the set are implied by permissions in this set
             for (var permission : set){
                 if (!permissions.anyMatch(it -> it.implies(permission))){
@@ -51,12 +51,12 @@ final class HashPermissionSet implements PermissionSet {
     }
 
     @Override
-    public Enumerator<org.midheaven.application.security.permission.Permission> enumerator() {
+    public Enumerator<Permission> enumerator() {
         return permissions.enumerator();
     }
 
-    public HashPermissionSet addPermission(org.midheaven.application.security.permission.Permission permission){
-        if (permission instanceof org.midheaven.application.security.permission.PermissionSet set){
+    public HashPermissionSet addPermission(Permission permission){
+        if (permission instanceof PermissionSet set){
             permissions.addAll(set);
         } else {
             permissions.add(permission);
@@ -64,8 +64,8 @@ final class HashPermissionSet implements PermissionSet {
         return this;
     }
 
-    public HashPermissionSet removePermission(org.midheaven.application.security.permission.Permission permission){
-        if (permission instanceof org.midheaven.application.security.permission.PermissionSet set){
+    public HashPermissionSet removePermission(Permission permission){
+        if (permission instanceof PermissionSet set){
             permissions.removeAll(set);
         } else {
             permissions.remove(permission);
@@ -73,7 +73,7 @@ final class HashPermissionSet implements PermissionSet {
         return this;
     }
 
-    public HashPermissionSet retainAll(org.midheaven.application.security.permission.PermissionSet other) {
+    public HashPermissionSet retainAll(PermissionSet other) {
         this.permissions.retainAll(other);
         return this;
     }

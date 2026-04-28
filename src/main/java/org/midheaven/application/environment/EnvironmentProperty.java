@@ -1,5 +1,9 @@
 package org.midheaven.application.environment;
 
+import org.midheaven.application.network.Email;
+import org.midheaven.application.network.Url;
+import org.midheaven.io.ByteContentSize;
+import org.midheaven.io.ByteContentSizeUnit;
 import org.midheaven.lang.Maybe;
 import org.midheaven.lang.NotNullable;
 
@@ -35,6 +39,18 @@ public @NotNullable interface EnvironmentProperty<T> {
     
     static EnvironmentProperty<Duration> ofDuration(String name, TemporalUnit unit) {
         return new DurationEnvironmentProperty(name, unit);
+    }
+    
+    static EnvironmentProperty<Url> ofUrl(String name) {
+        return new TypedEnvironmentProperty<>(name, Url.class,Url::parse);
+    }
+    
+    static EnvironmentProperty<Email> ofEmail(String name) {
+        return new TypedEnvironmentProperty<>(name, Email.class,Email::parse);
+    }
+    
+    static EnvironmentProperty<ByteContentSize> ofByteSize(String name, ByteContentSizeUnit unit) {
+        return new TypedEnvironmentProperty<>(name, ByteContentSize.class, valueInUnit -> ByteContentSize.of(Long.parseLong(valueInUnit), unit));
     }
     
     String name();

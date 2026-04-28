@@ -2,16 +2,24 @@ package org.midheaven.application.security.permission;
 
 import org.midheaven.collections.Enumerable;
 
-public interface PermissionSet extends org.midheaven.application.security.permission.Permission, Enumerable<org.midheaven.application.security.permission.Permission> {
-
-    static PermissionSet of(Iterable<org.midheaven.application.security.permission.Permission> permissions){
+public interface PermissionSet extends Permission, Enumerable<Permission> {
+    
+    static PermissionSet of(Permission permission){
+        return new HashPermissionSet(permission);
+    }
+    
+    static PermissionSet of(Permission a, Permission b , Permission ... others){
+        return new HashPermissionSet(others).addPermission(a).addPermission(b);
+    }
+    
+    static PermissionSet of(Iterable<Permission> permissions){
         if (!permissions.iterator().hasNext()){
             return empty();
         }
         return new HashPermissionSet(permissions);
     }
 
-    static PermissionSet of(Enumerable<org.midheaven.application.security.permission.Permission> permissions){
+    static PermissionSet of(Enumerable<Permission> permissions){
         if (permissions.isEmpty()){
             return empty();
         }
@@ -21,20 +29,16 @@ public interface PermissionSet extends org.midheaven.application.security.permis
     static PermissionSet empty(){
         return org.midheaven.application.security.permission.EmptyPermissionSet.INSTANCE;
     }
-
-    static PermissionSet of(org.midheaven.application.security.permission.Permission first, org.midheaven.application.security.permission.Permission... permissions){
-        return new HashPermissionSet(permissions).addPermission(first);
-    }
-
+    
     boolean isEmpty();
 
-    org.midheaven.application.security.permission.Permission reduce();
+    Permission reduce();
 
     default PermissionSet union(PermissionSet other){
         return PermissionsSupport.union(this, other);
     }
 
     default PermissionSet intersection(PermissionSet other){
-        return org.midheaven.application.security.permission.PermissionsSupport.intersection(this, other);
+        return PermissionsSupport.intersection(this, other);
     }
 }

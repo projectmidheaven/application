@@ -5,7 +5,9 @@ import org.midheaven.lang.Strings;
 
 public abstract class FeaturePath {
     
-    static FeaturePath from(String qualifiedName) {
+    public static final char SEPARATOR = '-';
+    
+    public static FeaturePath from(String qualifiedName) {
         return new NamedFeaturePath(qualifiedName);
     }
     
@@ -40,7 +42,7 @@ class NamedFeaturePath extends FeaturePath{
     
     @Override
     String simpleName() {
-        return Strings.Splitter.split(qualifiedName).by('.').last().orNull();
+        return Strings.Splitter.split(qualifiedName).by(SEPARATOR).last().orNull();
     }
     
     @Override
@@ -50,10 +52,10 @@ class NamedFeaturePath extends FeaturePath{
     
     @Override
     Maybe<FeaturePath> parentPath() {
-        var parent =  Strings.Splitter.split(qualifiedName).by('.').withoutLast();
+        var parent =  Strings.Splitter.split(qualifiedName).by(SEPARATOR).withoutLast();
         if (parent.isEmpty()){
             return Maybe.none();
         }
-        return Maybe.of(new NamedFeaturePath(parent.join('.')));
+        return Maybe.of(new NamedFeaturePath(parent.join(SEPARATOR)));
     }
 }

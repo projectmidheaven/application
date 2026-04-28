@@ -2,36 +2,36 @@ package org.midheaven.application.security.permission;
 
 import java.util.function.BiPredicate;
 
-class PermissionsSupport {
+public class PermissionsSupport {
 
-    static boolean implies(org.midheaven.application.security.permission.Permission a , org.midheaven.application.security.permission.Permission b, BiPredicate<org.midheaven.application.security.permission.Permission, org.midheaven.application.security.permission.Permission> singleImplies){
+    public static boolean implies(Permission a , Permission b, BiPredicate<Permission, Permission> singleImplies){
         if ( a == null || b == null){
             return false;
         } else if ( a == b){
             return true;
         }
 
-        a = a instanceof org.midheaven.application.security.permission.PermissionSet setA ? setA.reduce() : a;
-        b = b instanceof org.midheaven.application.security.permission.PermissionSet setB ? setB.reduce() : b;
+        a = a instanceof PermissionSet setA ? setA.reduce() : a;
+        b = b instanceof PermissionSet setB ? setB.reduce() : b;
 
-        if (a instanceof org.midheaven.application.security.permission.PermissionSet setA){
-            if (b instanceof org.midheaven.application.security.permission.PermissionSet setB){
+        if (a instanceof PermissionSet setA){
+            if (b instanceof PermissionSet setB){
                 return implies(setA, setB, singleImplies);
             }
             return implies(setA, b, singleImplies);
         } else {
-            if (b instanceof org.midheaven.application.security.permission.PermissionSet setB){
+            if (b instanceof PermissionSet setB){
                 return implies(a, setB, singleImplies);
             }
             return singleImplies.test(a, b);
         }
     }
 
-    static private boolean implies(org.midheaven.application.security.permission.Permission a , org.midheaven.application.security.permission.PermissionSet b, BiPredicate<org.midheaven.application.security.permission.Permission, org.midheaven.application.security.permission.Permission> singleImplies){
+    static private boolean implies(Permission a , PermissionSet b, BiPredicate<Permission, Permission> singleImplies){
         return b.isEmpty();
     }
 
-    static private boolean implies(org.midheaven.application.security.permission.PermissionSet a , org.midheaven.application.security.permission.Permission b, BiPredicate<org.midheaven.application.security.permission.Permission, org.midheaven.application.security.permission.Permission> singleImplies){
+    static private boolean implies(PermissionSet a , Permission b, BiPredicate<Permission, Permission> singleImplies){
         for (var p : a){
             if (p.implies(b)){
                 return true;
@@ -40,7 +40,7 @@ class PermissionsSupport {
         return false;
     }
 
-    static private boolean implies(org.midheaven.application.security.permission.PermissionSet a , org.midheaven.application.security.permission.PermissionSet b, BiPredicate<org.midheaven.application.security.permission.Permission, org.midheaven.application.security.permission.Permission> singleImplies){
+    static private boolean implies(PermissionSet a , PermissionSet b, BiPredicate<Permission, Permission> singleImplies){
         // every in b is implied
         for (var pb : b){
             if (!a.anyMatch(it -> it.implies(b))){
@@ -50,18 +50,18 @@ class PermissionsSupport {
         return true;
     }
 
-    static org.midheaven.application.security.permission.PermissionSet union(org.midheaven.application.security.permission.PermissionSet a, org.midheaven.application.security.permission.PermissionSet b) {
+    static PermissionSet union(PermissionSet a, PermissionSet b) {
         if (a.isEmpty()){
-            return b.isEmpty() ? org.midheaven.application.security.permission.PermissionSet.empty() : b;
+            return b.isEmpty() ? PermissionSet.empty() : b;
         } else if (b.isEmpty()){
             return a;
         }
         return new org.midheaven.application.security.permission.HashPermissionSet(a).addPermission(b);
     }
 
-    static org.midheaven.application.security.permission.PermissionSet intersection(org.midheaven.application.security.permission.PermissionSet a, org.midheaven.application.security.permission.PermissionSet b) {
+    static PermissionSet intersection(PermissionSet a, PermissionSet b) {
         if (a.isEmpty() || b.isEmpty()){
-            return org.midheaven.application.security.permission.PermissionSet.empty();
+            return PermissionSet.empty();
         }
         return new org.midheaven.application.security.permission.HashPermissionSet(a).retainAll(b);
     }

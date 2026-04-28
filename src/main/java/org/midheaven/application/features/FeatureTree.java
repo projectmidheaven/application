@@ -17,7 +17,7 @@ public class FeatureTree {
         
         return feature;
     }
-
+    
     public Maybe<Feature> resolve(FeaturePath path){
         if (path == null){
             return Maybe.none();

@@ -24,7 +24,7 @@ public class FeatureTestCases {
     @Test
     public void resolution(){
         
-        var path = FeaturePath.from("user.session.login");
+        var path = FeaturePath.from("user-session-login");
         var login = tree.resolve(path);
         
         assertTrue(login.isPresent());

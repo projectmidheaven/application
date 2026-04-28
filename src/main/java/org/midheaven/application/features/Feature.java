@@ -46,7 +46,7 @@ public class Feature {
             
             @Override
             public String qualifiedName() {
-                return parent == null ? name : parent.path().qualifiedName() + "." + name;
+                return parent == null ? name : parent.path().qualifiedName() + FeaturePath.SEPARATOR + name;
             }
             
             @Override
