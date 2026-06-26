@@ -9,8 +9,12 @@ public interface StoreQuery {
     
     Maybe<TableRow> find();
     Sequence<TableRow> all();
+   
     boolean any();
     Int count();
     
     Page<TableRow> paginate(int pageOrdinal, int maxItemsPerPageCount);
+    
+    StoreQuery project(ColumnMetadata first, ColumnMetadata ... others);
+    
 }

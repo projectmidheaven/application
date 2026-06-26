@@ -2,6 +2,7 @@ package org.midheaven.application.events;
 
 import org.midheaven.application.ConsumingExceptionHandler;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,8 +20,14 @@ public class ImediateListEventBus implements EventBus{
         this.handler = handler;
     }
     
-    public void addListener(EventListener eventListener){
+    public ImediateListEventBus addListener(EventListener eventListener){
         this.listeners.add(eventListener);
+        return this;
+    }
+    
+    public ImediateListEventBus addListeners(EventListener ... eventListeners){
+        this.listeners.addAll(Arrays.asList(eventListeners));
+        return this;
     }
     
     @Override

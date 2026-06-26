@@ -47,9 +47,26 @@
     </dependency>
 
     <dependency>
+      <groupId>midheaven</groupId>
+      <artifactId>midheaven.validation</artifactId>
+      <version>0.1.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>2.2</version>
+    </dependency>
+
+
+    <!-- see https://github.com/google/libphonenumber -->
+    <dependency>
+      <groupId>com.googlecode.libphonenumber</groupId>
+      <artifactId>libphonenumber</artifactId>
+      <version>9.0.29</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>

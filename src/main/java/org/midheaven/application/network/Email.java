@@ -13,13 +13,13 @@ public final class Email  {
     private final String address;
 
     private Email(String address){
-        this.address = address.toLowerCase();
+        this.address = address;
     }
 
     @Override
     public boolean equals(Object other){
         return other instanceof Email that
-            && that.address.equals(this.address);
+            && that.address.equalsIgnoreCase(this.address);
     }
 
     public String address(){

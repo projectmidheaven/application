@@ -12,7 +12,8 @@ public class EditableColumnMetadata implements ColumnMetadata{
     private boolean isUnique;
     private Integer maxLength;
     private Integer minLength;
-
+    private boolean isNeverAbsentAfterSet;
+    
     public EditableColumnMetadata(String name, ColumnType type){
         this.name = name;
         this.type = type;
@@ -61,6 +62,11 @@ public class EditableColumnMetadata implements ColumnMetadata{
     }
     
     @Override
+    public boolean isNeverAbsentAfterSet() {
+        return isNeverAbsentAfterSet;
+    }
+    
+    @Override
     public Maybe<Integer> maxLength() {
         return Maybe.of(maxLength);
     }
@@ -83,6 +89,11 @@ public class EditableColumnMetadata implements ColumnMetadata{
     
     public EditableColumnMetadata withRequired(boolean required) {
         this.required = required;
+        return this;
+    }
+    
+    public EditableColumnMetadata isNeverAbsentAfterSet(boolean isNeverAbsentAfterSet) {
+        this.isNeverAbsentAfterSet = isNeverAbsentAfterSet;
         return this;
     }
 }

@@ -20,10 +20,22 @@ public interface Translatable {
     static Translatable invariant(String text){
         return new InvariantTranslatable(text);
     }
+    
+    boolean isInvariant();
+    String content();
 }
 
 record InvariantTranslatable(String text) implements Translatable{
-
+    
+    @Override
+    public boolean isInvariant() {
+        return true;
+    }
+    
+    @Override
+    public String content() {
+        return text;
+    }
 }
 
 record KeyTranslatable(String translationKey,  Sequence<Object> translationParameters) implements ReduceableTranslatable{
@@ -39,5 +51,15 @@ record KeyTranslatable(String translationKey,  Sequence<Object> translationParam
             Strings.Splitter.split(translationKey).by('.').withoutFirst().join("."),
             translationParameters
         );
+    }
+    
+    @Override
+    public boolean isInvariant() {
+        return false;
+    }
+    
+    @Override
+    public String content() {
+        return translationKey;
     }
 }

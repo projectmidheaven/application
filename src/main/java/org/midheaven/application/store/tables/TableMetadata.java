@@ -5,6 +5,10 @@ import org.midheaven.lang.Strings;
 import org.midheaven.lang.reflection.InvocationHandler;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public interface TableMetadata {
     
@@ -31,15 +35,30 @@ class RowInvocationAdapter implements InvocationHandler {
     public Object handleInvocation(Object o, Method method, Object[] objects) throws Throwable {
         var name = method.getName();
         if (name.startsWith("get")){
-            name = Strings.transform(name.substring(3), Strings.Casing.PASCAL, Strings.Casing.CAMEL);
-            return convert(tableRow.metadata().column(name), method.getReturnType());
+            if(name.length() == 3){
+                // tableRow method
+                return tableRow.get((ColumnMetadata) objects[0]);
+            } else{
+                // bean method
+                name = Strings.transform(name.substring(3), Strings.Casing.PASCAL, Strings.Casing.CAMEL);
+                return  method.getReturnType().cast((tableRow.get(tableRow.metadata().column(name))));
+            }
         } else if (name.startsWith("set")){
-            name = Strings.transform(name.substring(3), Strings.Casing.PASCAL, Strings.Casing.CAMEL);
-            tableRow.set(tableRow.metadata().column(name),objects[0]);
-            return null;
+            if(name.length() == 3){
+                // tableRow method
+                tableRow.set((ColumnMetadata) objects[0], objects[1]);
+                return null;
+            } else {
+                // bean method
+                name = Strings.transform(name.substring(3), Strings.Casing.PASCAL, Strings.Casing.CAMEL);
+                var column = tableRow.metadata().column(name);
+                tableRow.set(column, ensureCorrectType(column, objects[0]));
+                return null;
+            }
+         
         } else if (name.startsWith("is")){
             name = Strings.transform(name.substring(2), Strings.Casing.PASCAL, Strings.Casing.CAMEL);
-            return convert(tableRow.metadata().column(name), method.getReturnType());
+            return  method.getReturnType().cast((tableRow.get(tableRow.metadata().column(name))));
         } else if (name.equals("metadata")){
             return tableRow.metadata();
         } else if (name.equals("asMap")){
@@ -49,19 +68,24 @@ class RowInvocationAdapter implements InvocationHandler {
         throw new IllegalStateException("unrecognized call");
     }
     
-    private Object convert(Object value, Class<?> returnType) {
-        if (value == null || returnType.isInstance(value)){
-            return returnType.cast(value);
-        }
-//        if (conversionService != null){
-//            if (Maybe.class.isAssignableFrom(returnType)){
-//                return Maybe.of(conversionService.convert(value, returnType));
-//            } else if (Optional.class.isAssignableFrom(returnType)){
-//                return Optional.ofNullable(conversionService.convert(value, returnType));
-//            }
-//            return conversionService.convert(value, returnType);
-//        }
-        
-        return returnType.cast(value);
+    private Object ensureCorrectType(ColumnMetadata column, Object value) {
+       if(value == null){
+           return null;
+       }
+       try {
+           return switch (column.type()) {
+               case IDENTIFIER -> value;
+               case TEXT, MEMO -> (String) value;
+               case COUNT, CHOICE -> (Number) value;
+               case DATE -> (LocalDate) value;
+               case TIME -> (LocalTime) value;
+               case DATETIME -> (LocalDateTime) value;
+               case LOGICAL -> (Boolean) value;
+               case NUMERIC -> (BigDecimal) value;
+           };
+       }catch (ClassCastException e){
+           throw new IllegalArgumentException("Type " + value.getClass() + " is not compatible with column type " + column.type() );
+       }
     }
+    
 }

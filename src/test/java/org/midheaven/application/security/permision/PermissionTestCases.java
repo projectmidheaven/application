@@ -2,8 +2,10 @@ package org.midheaven.application.security.permision;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.midheaven.application.security.permission.ActionPermission;
 import org.midheaven.application.security.permission.NamedPermission;
 import org.midheaven.application.security.permission.PermissionSet;
+import org.midheaven.application.security.permission.ScopedPermission;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,7 +31,7 @@ public class PermissionTestCases {
         var b = NamedPermission.name("B");
         var c = NamedPermission.name("C");
         
-        var empty = PermissionSet.empty();
+        var emptySet = PermissionSet.empty();
         var setA = PermissionSet.of(a);
         var setB = PermissionSet.of(b);
         var setC = PermissionSet.of(c);
@@ -46,11 +48,71 @@ public class PermissionTestCases {
         assertFalse(setC.implies(b));
         assertTrue(setC.implies(c));
         
-        assertTrue(setA.implies(empty));
-        assertTrue(a.implies(empty));
-        assertTrue(setAB.implies(empty));
-        assertFalse(empty.implies(setA));
-        assertFalse(empty.implies(a));
-        assertFalse(empty.implies(setAB));
+        assertTrue(setA.implies(emptySet));
+        assertTrue(a.implies(emptySet));
+        assertTrue(setAB.implies(emptySet));
+        assertFalse(emptySet.implies(setA));
+        assertFalse(emptySet.implies(a));
+        assertFalse(emptySet.implies(setAB));
+    }
+    
+    @Test
+    public void scopeImplicationCases(){
+        var x = NamedPermission.name("X");
+        var a = ScopedPermission.scope("A", x);
+        var aa = ScopedPermission.scope("A", x);
+        var aSet = ScopedPermission.scope("A", PermissionSet.of(x));
+        var b = ScopedPermission.scope("B", x);
+        var c = ScopedPermission.scope("A", NamedPermission.name("Y"));
+        
+        var emptySet = PermissionSet.empty();
+        
+        assertTrue(a.implies(emptySet));
+        assertFalse(emptySet.implies(a));
+        assertTrue(b.implies(emptySet));
+        assertFalse(emptySet.implies(b));
+     
+        assertTrue(c.implies(emptySet));
+        assertFalse(emptySet.implies(c));
+        
+        assertFalse(a.implies(b));
+        assertFalse(a.implies(c));
+        assertFalse(b.implies(a));
+        assertFalse(b.implies(c));
+        assertFalse(c.implies(a));
+        assertFalse(c.implies(b));
+        
+        assertTrue(a.implies(aa));
+        assertTrue(aa.implies(a));
+        assertTrue(a.implies(aSet));
+        assertTrue(aSet.implies(a));
+    }
+    
+    @Test
+    public void actionImplicationCases(){
+        var a = ActionPermission.over("R1", () -> "op1");
+        var aa = ActionPermission.over("R1", () -> "op1");
+        var b = ActionPermission.over("R2", () -> "op1");
+        var c = ActionPermission.over("R1", () -> "op2");
+        
+        var emptySet = PermissionSet.empty();
+        
+        assertTrue(a.implies(emptySet));
+        assertFalse(emptySet.implies(a));
+        assertTrue(b.implies(emptySet));
+        assertFalse(emptySet.implies(b));
+        
+        assertTrue(c.implies(emptySet));
+        assertFalse(emptySet.implies(c));
+        
+        assertFalse(a.implies(b));
+        assertFalse(a.implies(c));
+        assertFalse(b.implies(a));
+        assertFalse(b.implies(c));
+        assertFalse(c.implies(a));
+        assertFalse(c.implies(b));
+        
+        assertTrue(a.implies(aa));
+        assertTrue(aa.implies(a));
     }
 }

@@ -6,5 +6,7 @@ public interface EventBus {
     
     void send(Event event);
     void sendAll(Collection<? extends Event> events);
-    void addListener(EventListener listener);
+    
+    EventBus addListener(EventListener listener);
+    EventBus addListeners(EventListener ... listeners);
 }
