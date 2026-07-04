@@ -20,13 +20,16 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
             
             @Override
             public QueryWhereColumnConstraint column(String columnName) {
+                if (tableMetadata.column(columnName) == null){
+                    throw new IllegalArgumentException("Column "  +  columnName + " is not in table " + tableMetadata.logicName());
+                }
                 return new InnerQueryWhereFieldConstraint(tableMetadata.column(columnName), false);
             }
             
             @Override
             public QueryWhereColumnConstraint column(ColumnMetadata columnMetadata) {
                 if (tableMetadata.column(columnMetadata.logicName()) == null){
-                    throw new IllegalArgumentException("Column "  +  columnMetadata.logicName() + " is not of table " + tableMetadata.logicName());
+                    throw new IllegalArgumentException("Column "  +  columnMetadata.logicName() + " is not in table " + tableMetadata.logicName());
                 }
                 return new InnerQueryWhereFieldConstraint(columnMetadata, false);
             }
