@@ -6,6 +6,11 @@ import org.midheaven.lang.NotNullable;
 public final class ActionPermission implements Permission {
     
     public interface PermittableResourceAction {
+        
+        static PermittableResourceAction named(String name){
+            return () -> name;
+        }
+        
         String name();
     }
     

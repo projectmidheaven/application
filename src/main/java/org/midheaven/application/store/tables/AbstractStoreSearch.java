@@ -110,8 +110,8 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
         }
         
         @Override
-        public Text text() {
-            return new Text() {
+        public TextConstraints text() {
+            return new TextConstraints() {
                 @Override
                 public void contains(CharSequence text) {
                     columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.CONTAINS_TEXT.negate(negated), text));
@@ -125,6 +125,31 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
                 @Override
                 public void endsWith(CharSequence text) {
                     columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.ENDS_WITH_TEXT.negate(negated), text));
+                }
+            };
+        }
+        
+        @Override
+        public ComparableConstraints value() {
+            return new ComparableConstraints() {
+                @Override
+                public void isLessThan(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.LESS_THAN.negate(negated), value));
+                }
+                
+                @Override
+                public void isLessThanOrEqualTo(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.LESS_THAN_OR_EQUAL.negate(negated), value));
+                }
+                
+                @Override
+                public void isGreaterThan(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.GREATER_THAN.negate(negated), value));
+                }
+                
+                @Override
+                public void isGreaterThanOrEqualTo(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.GREATER_THAN_OR_EQUAL.negate(negated), value));
                 }
             };
         }

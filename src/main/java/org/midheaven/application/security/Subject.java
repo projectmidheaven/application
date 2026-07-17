@@ -5,6 +5,8 @@ import org.midheaven.lang.Check;
 import org.midheaven.lang.Maybe;
 import org.midheaven.lang.NotNullable;
 
+import java.util.function.Supplier;
+
 public sealed abstract class Subject permits PermitedSubject {
     
     public abstract @NotNullable SubjectIdentity identity();
@@ -43,5 +45,15 @@ public sealed abstract class Subject permits PermitedSubject {
             }
         }
         return true;
+    }
+    
+    public void clears(SubjectAuthorization authorization){
+        this.clears(authorization, AuthorizationFailedException::new);
+    }
+    
+    public void clears(SubjectAuthorization authorization, Supplier<? extends AuthorizationFailedException> supplier){
+        if(!authorization.isClearedBy(this)){
+            throw supplier.get();
+        }
     }
 }

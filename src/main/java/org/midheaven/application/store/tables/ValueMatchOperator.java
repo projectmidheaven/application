@@ -8,6 +8,10 @@ public class ValueMatchOperator {
     public static final ValueMatchOperator ENDS_WITH_TEXT = new ValueMatchOperator(ValueMatchOperation.ENDS_WITH_TEXT, false);
     public static final ValueMatchOperator STARTS_WITH_TEXT = new ValueMatchOperator(ValueMatchOperation.STARTS_WITH_TEXT, false);
     public static final ValueMatchOperator IN = new ValueMatchOperator(ValueMatchOperation.IN, false);
+    public static final ValueMatchOperator LESS_THAN = new ValueMatchOperator(ValueMatchOperation.LESS_THAN, false);;
+    public static final ValueMatchOperator LESS_THAN_OR_EQUAL = new ValueMatchOperator(ValueMatchOperation.LESS_THAN_OR_EQUAL, false);;
+    public static final ValueMatchOperator GREATER_THAN = new ValueMatchOperator(ValueMatchOperation.GREATER_THAN, false);;
+    public static final ValueMatchOperator GREATER_THAN_OR_EQUAL = new ValueMatchOperator(ValueMatchOperation.GREATER_THAN_OR_EQUAL, false);;
     
     private final boolean isNegated;
     private final ValueMatchOperation operation;
