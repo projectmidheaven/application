@@ -13,7 +13,7 @@ public interface StoreQuery {
     boolean any();
     Int count();
     
-    Page<TableRow> paginate(int pageOrdinal, int maxItemsPerPageCount);
+    Page<TableRow> paginate(int pageOrdinal, Integer maxItemsPerPageCount);
     
     StoreQuery project(ColumnMetadata first, ColumnMetadata ... others);
     
