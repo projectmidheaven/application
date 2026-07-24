@@ -1,5 +1,6 @@
 package org.midheaven.application.store.tables;
 
+import org.midheaven.collections.DistinctAssortment;
 import org.midheaven.collections.Page;
 import org.midheaven.collections.Sequence;
 import org.midheaven.lang.Maybe;
@@ -8,8 +9,10 @@ import org.midheaven.math.Int;
 public interface StoreQuery {
     
     Maybe<TableRow> find();
+    Maybe<TableRow> first();
     Sequence<TableRow> all();
-   
+    DistinctAssortment<Object> ids();
+    
     boolean any();
     Int count();
     
