@@ -1,5 +1,7 @@
 package org.midheaven.application.store.tables;
 
+import java.util.function.Consumer;
+
 public interface QueryWhereColumnConstraint {
     
     interface TextConstraints {
@@ -24,4 +26,5 @@ public interface QueryWhereColumnConstraint {
     
     TextConstraints text();
     ComparableConstraints value();
+    void join(String tableName, Consumer<QueryWhere> joinWhere);
 }

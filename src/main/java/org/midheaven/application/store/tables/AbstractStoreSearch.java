@@ -1,5 +1,9 @@
 package org.midheaven.application.store.tables;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public abstract class AbstractStoreSearch implements StoreQuerySearch{
@@ -7,11 +11,31 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
     protected final TableMetadata tableMetadata;
     protected final ListConstraint columnConstraint = new ListConstraint();
     protected final ListConstraint orderConstraint = new ListConstraint();
+    private final TableRegister register;
+    protected final Map<String, TableMetadata> aliasToTableMapping = new HashMap<>();
+    protected final Map<String, String> tableToAliasMapping = new HashMap<>();
+    protected final List<JoinOnConstraint> joins = new ArrayList<>();
     
+    private char letter = 'A';
     protected AbstractStoreSearch(
+        TableRegister register,
         TableMetadata tableMetadata
     ){
+        this.register = register;
         this.tableMetadata = tableMetadata;
+        newAlias(tableMetadata);
+    }
+    
+    private String aliasOf(TableMetadata tableMetadata){
+        return tableToAliasMapping.get(tableMetadata.logicName());
+    }
+    
+    private String newAlias(TableMetadata tableMetadata){
+        var alias = Character.toString(letter);
+        aliasToTableMapping.put(alias,tableMetadata);
+        tableToAliasMapping.put(tableMetadata.logicName(), alias);
+        letter++;
+        return alias;
     }
     
     @Override
@@ -23,7 +47,8 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
                 if (tableMetadata.column(columnName) == null){
                     throw new IllegalArgumentException("Column "  +  columnName + " is not in table " + tableMetadata.logicName());
                 }
-                return new InnerQueryWhereFieldConstraint(tableMetadata.column(columnName), false);
+                var alias = aliasOf(tableMetadata);
+                return new InnerQueryWhereFieldConstraint(new QualifiedColumn(alias,tableMetadata.column(columnName)), false);
             }
             
             @Override
@@ -31,7 +56,8 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
                 if (tableMetadata.column(columnMetadata.logicName()) == null){
                     throw new IllegalArgumentException("Column "  +  columnMetadata.logicName() + " is not in table " + tableMetadata.logicName());
                 }
-                return new InnerQueryWhereFieldConstraint(columnMetadata, false);
+                var alias = aliasOf(tableMetadata);
+                return new InnerQueryWhereFieldConstraint(new QualifiedColumn(alias,columnMetadata), false);
             }
         };
         
@@ -64,7 +90,7 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
                     
                     @Override
                     public void order(SortOrder order) {
-                        orderConstraint.list.add(new SortConstraint(column, order));
+                        orderConstraint.list.add(new SortConstraint(new QualifiedColumn("A", column), order));
                     }
                 };
             }
@@ -81,10 +107,10 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
     
     class InnerQueryWhereFieldConstraint implements QueryWhereColumnConstraint {
         
-        private final ColumnMetadata column;
+        private final QualifiedColumn column;
         private final boolean negated;
         
-        public InnerQueryWhereFieldConstraint(ColumnMetadata column, boolean negated) {
+        public InnerQueryWhereFieldConstraint(QualifiedColumn column, boolean negated) {
             this.column = column;
             this.negated = negated;
         }
@@ -152,6 +178,35 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
                     columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.GREATER_THAN_OR_EQUAL.negate(negated), value));
                 }
             };
+        }
+        
+        @Override
+        public void join(String tableName, Consumer<QueryWhere> joinWhere) {
+            var joinTable = register.tableOf(tableName);
+            var alias = newAlias(joinTable);
+            
+            joins.add(new JoinOnConstraint(column, new QualifiedColumn(alias, joinTable.primaryColumn()), ValueMatchOperator.EQUALS));
+            
+            var fieldsConstraintBlock = new QueryWhere(){
+                
+                @Override
+                public QueryWhereColumnConstraint column(String columnName) {
+                    if (joinTable.column(columnName) == null){
+                        throw new IllegalArgumentException("Column "  +  columnName + " is not in table " + joinTable.logicName());
+                    }
+                    return new InnerQueryWhereFieldConstraint(new QualifiedColumn(alias, joinTable.column(columnName)), false);
+                }
+                
+                @Override
+                public QueryWhereColumnConstraint column(ColumnMetadata columnMetadata) {
+                    if (joinTable.column(columnMetadata.logicName()) == null){
+                        throw new IllegalArgumentException("Column "  +  columnMetadata.logicName() + " is not in table " + joinTable.logicName());
+                    }
+                    return new InnerQueryWhereFieldConstraint(new QualifiedColumn(alias, columnMetadata), false);
+                }
+            };
+            
+            joinWhere.accept(fieldsConstraintBlock);
         }
         
     }
