@@ -8,5 +8,18 @@ public interface EventBus {
     void sendAll(Collection<? extends Event> events);
     
     EventBus addListener(EventListener listener);
-    EventBus addListeners(EventListener ... listeners);
+    
+    default EventBus addListeners(Collection<? extends EventListener> listeners){
+      for (var listener : listeners){
+          addListener(listener);
+      }
+      return this;
+    }
+    
+    default EventBus addListeners(EventListener ... listeners){
+        for (var listener : listeners){
+            addListener(listener);
+        }
+        return this;
+    }
 }

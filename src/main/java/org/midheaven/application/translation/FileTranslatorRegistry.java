@@ -7,6 +7,7 @@ import org.midheaven.io.ByteContent;
 import org.midheaven.io.ByteContentFormats;
 import org.midheaven.lang.Maybe;
 import org.midheaven.lang.NotNullable;
+import org.midheaven.lang.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,13 +28,13 @@ public class FileTranslatorRegistry implements TranslatorsRegistry{
     }
     
     @Override
-    public Translator translator() {
+    public @NotNullable Translator translator() {
         return resolveTranslator(defaultCulture);
     }
     
     @Override
-    public Translator translator(Culture culture) {
-        return resolveTranslator(culture);
+    public @NotNullable Translator translator(@Nullable Culture culture) {
+        return resolveTranslator(culture == null ? defaultCulture : culture);
     }
     
     private AbstractTranslator resolveTranslator(Culture culture) {

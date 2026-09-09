@@ -6,6 +6,7 @@ import org.midheaven.culture.CountryCode;
 import org.midheaven.lang.Maybe;
 import org.midheaven.lang.ParsingException;
 import org.midheaven.lang.Strings;
+import org.midheaven.math.AvailableRandomGenerators;
 import org.midheaven.validation.Validation;
 
 import java.util.Map;
@@ -32,6 +33,10 @@ public class FiscalNumberSpecificationRegistry {
              return defaultSpecification;
          }
          return specification;
+    }
+    
+    static FiscalNumber generate(CountryCode countryCode, FiscalPersonType type, AvailableRandomGenerators randomGenerator) {
+        return specificationFor(countryCode).generate(countryCode, type, randomGenerator);
     }
     
     static Validation validate(FiscalNumber fiscalNumber) {
@@ -76,6 +81,11 @@ class DefaultFiscalNumberSpecification implements FiscalNumberSpecification {
     @Override
     public Validation validate(FiscalNumber fiscalNumber) {
         return Validation.valid();
+    }
+    
+    @Override
+    public FiscalNumber generate(CountryCode countryCode,FiscalPersonType type, AvailableRandomGenerators randomGenerators) {
+        return null;
     }
     
 }

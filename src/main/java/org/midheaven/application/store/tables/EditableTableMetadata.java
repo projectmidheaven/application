@@ -1,8 +1,7 @@
 package org.midheaven.application.store.tables;
 
 import org.midheaven.collections.Association;
-import org.midheaven.collections.Assortment;
-import org.midheaven.collections.DistinctAssortment;
+import org.midheaven.collections.Enumerable;
 import org.midheaven.collections.ResizableAssociation;
 
 public class EditableTableMetadata implements TableMetadata {
@@ -32,8 +31,8 @@ public class EditableTableMetadata implements TableMetadata {
     }
     
     @Override
-    public Assortment<ColumnMetadata> columns() {
-        return DistinctAssortment.builder().from(columns.values());
+    public Enumerable<ColumnMetadata> columns() {
+        return columns.values().ofType(ColumnMetadata.class);
     }
     
     @Override
@@ -44,6 +43,12 @@ public class EditableTableMetadata implements TableMetadata {
     @Override
     public EditableColumnMetadata primaryColumn() {
         return primaryColumn;
+    }
+    
+    @Override
+    public Enumerable<ColumnMetadata> columnsByPrefix(String prefix) {
+        return columns.filter(entry -> entry.key().startsWith(prefix))
+                   .map(Association.Entry::value);
     }
     
     public EditableTableMetadata addColumn(ColumnMetadata columnMetadata){

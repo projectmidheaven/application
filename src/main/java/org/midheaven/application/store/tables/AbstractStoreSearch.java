@@ -1,5 +1,7 @@
 package org.midheaven.application.store.tables;
 
+import org.midheaven.math.Interval;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,12 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
     @Override
     public StoreQuerySearch match(Consumer<QueryWhere> matcher) {
         var fieldsConstraintBlock = new QueryWhere(){
+            
+            @Override
+            public QueryWhereColumnConstraint primaryColumn() {
+                var alias = aliasOf(tableMetadata);
+                return new InnerQueryWhereFieldConstraint(new QualifiedColumn(alias,tableMetadata.primaryColumn()), false);
+            }
             
             @Override
             public QueryWhereColumnConstraint column(String columnName) {
@@ -177,17 +185,58 @@ public abstract class AbstractStoreSearch implements StoreQuerySearch{
                 public void isGreaterThanOrEqualTo(Comparable<?> value) {
                     columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.GREATER_THAN_OR_EQUAL.negate(negated), value));
                 }
+                
+                @Override
+                public void in(Interval<?> interval) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.IN_INTERVAL.negate(negated), interval));
+                }
+                
+                @Override
+                public void isNullOrLessThan(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.LESS_THAN_OR_NULL.negate(negated), value));
+                }
+                
+                @Override
+                public void isNullOrLessThanOrEqualTo(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.LESS_THAN_OR_EQUAL_OR_NULL.negate(negated), value));
+                }
+                
+                @Override
+                public void isNullOrGreaterThan(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.GREATER_THAN_OR_NULL.negate(negated), value));
+                }
+                
+                @Override
+                public void isNullOrGreaterThanOrEqualTo(Comparable<?> value) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.GREATER_THAN_OR_EQUAL_OR_NULL.negate(negated), value));
+                }
+                
+                @Override
+                public void isNullOrIn(Interval<?> interval) {
+                    columnConstraint.list.add(new ValueConstraint(column, ValueMatchOperator.IN_INTERVAL_OR_NULL.negate(negated), interval));
+                }
             };
         }
         
         @Override
         public void join(String tableName, Consumer<QueryWhere> joinWhere) {
+            join(tableName, null, joinWhere);
+        }
+        
+        @Override
+        public void join(String tableName, String targetColumnName, Consumer<QueryWhere> joinWhere) {
             var joinTable = register.tableOf(tableName);
             var alias = newAlias(joinTable);
             
-            joins.add(new JoinOnConstraint(column, new QualifiedColumn(alias, joinTable.primaryColumn()), ValueMatchOperator.EQUALS));
+            var targetColumn = targetColumnName == null ? joinTable.primaryColumn() : joinTable.column(targetColumnName);
+            joins.add(new JoinOnConstraint(column, new QualifiedColumn(alias, targetColumn), ValueMatchOperator.EQUALS));
             
             var fieldsConstraintBlock = new QueryWhere(){
+                
+                @Override
+                public QueryWhereColumnConstraint primaryColumn() {
+                    return new InnerQueryWhereFieldConstraint(new QualifiedColumn(alias, joinTable.primaryColumn()), false);
+                }
                 
                 @Override
                 public QueryWhereColumnConstraint column(String columnName) {

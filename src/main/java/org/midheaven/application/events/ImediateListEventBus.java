@@ -14,6 +14,11 @@ public class ImediateListEventBus implements EventBus{
         return this;
     }
     
+    public ImediateListEventBus addListeners(Collection<? extends EventListener> eventListeners){
+        this.listeners.addAll(eventListeners);
+        return this;
+    }
+    
     public ImediateListEventBus addListeners(EventListener ... eventListeners){
         this.listeners.addAll(Arrays.asList(eventListeners));
         return this;

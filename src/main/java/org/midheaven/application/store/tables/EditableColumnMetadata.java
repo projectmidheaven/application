@@ -1,6 +1,7 @@
 package org.midheaven.application.store.tables;
 
 import org.midheaven.lang.Maybe;
+import org.midheaven.lang.Strings;
 
 public class EditableColumnMetadata implements ColumnMetadata{
     
@@ -13,6 +14,7 @@ public class EditableColumnMetadata implements ColumnMetadata{
     private Integer maxLength;
     private Integer minLength;
     private boolean isNeverAbsentAfterSet;
+    private String referesTo;
     
     public EditableColumnMetadata(String name, ColumnType type){
         this.name = name;
@@ -29,6 +31,8 @@ public class EditableColumnMetadata implements ColumnMetadata{
         this.isUnique = other.isUnique();
         this.maxLength = other.maxLength().orNull();
         this.minLength = other.minLength().orNull();
+        this.isNeverAbsentAfterSet = other.isNeverAbsentAfterSet();
+        this.referesTo = other.referesTo().orNull();
     }
     
     @Override
@@ -67,8 +71,21 @@ public class EditableColumnMetadata implements ColumnMetadata{
     }
     
     @Override
+    public Maybe<String> referesTo() {
+        return Strings.filled(referesTo);
+    }
+    
+    public void setReferesTo(String referesTo){
+        this.referesTo = referesTo;
+    }
+    
+    @Override
     public Maybe<Integer> maxLength() {
         return Maybe.of(maxLength);
+    }
+    
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
     }
     
     @Override
@@ -76,6 +93,9 @@ public class EditableColumnMetadata implements ColumnMetadata{
         return Maybe.of(minLength);
     }
     
+    public void setMinLength(Integer minLength) {
+        this.minLength = minLength;
+    }
     
     public EditableColumnMetadata isPrimaryKey(boolean primary) {
         this.primary = primary;

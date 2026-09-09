@@ -1,6 +1,6 @@
 package org.midheaven.application.store.tables;
 
-import org.midheaven.collections.Assortment;
+import org.midheaven.collections.Enumerable;
 import org.midheaven.lang.Strings;
 import org.midheaven.lang.reflection.InvocationHandler;
 
@@ -18,9 +18,10 @@ public interface TableMetadata {
     
     String logicName();
     String physicalName();
-    Assortment<ColumnMetadata> columns();
+    Enumerable<ColumnMetadata> columns();
     ColumnMetadata column(String name);
     ColumnMetadata primaryColumn();
+    Enumerable<ColumnMetadata> columnsByPrefix(String prefix);
 }
 
 class RowInvocationAdapter implements InvocationHandler {
@@ -74,7 +75,7 @@ class RowInvocationAdapter implements InvocationHandler {
        }
        try {
            return switch (column.type()) {
-               case IDENTIFIER -> value;
+               case IDENTIFIER , FOREIGN_IDENTIFIER -> value;
                case TEXT, MEMO -> (String) value;
                case COUNT, CHOICE -> (Number) value;
                case DATE -> (LocalDate) value;

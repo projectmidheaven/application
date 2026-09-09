@@ -3,29 +3,37 @@ package org.midheaven.application.translation;
 import org.midheaven.collections.Association;
 import org.midheaven.collections.ResizableAssociation;
 import org.midheaven.culture.Culture;
+import org.midheaven.lang.Check;
+import org.midheaven.lang.NotNullable;
+import org.midheaven.lang.Nullable;
 
 public class HashTranslatorsRegistry implements TranslatorsRegistry  {
     
     private final ResizableAssociation<Culture, Translator> mappings = Association.builder().resizable().empty();
-    private Translator defaultTranslator;
+    private final Translator defaultTranslator;
     
-    public HashTranslatorsRegistry register(Culture culture, Translator translator){
+    public HashTranslatorsRegistry(@NotNullable Translator defaultTranslator){
+        Check.argumentIsNotNull(defaultTranslator, "defaultTranslator");
+        this.defaultTranslator = defaultTranslator;
+    }
+    
+    public HashTranslatorsRegistry register(@NotNullable Culture culture, @NotNullable Translator translator){
+        Check.argumentIsNotNull(culture, "culture");
+        Check.argumentIsNotNull(translator, "translator");
         mappings.putValue(culture, translator);
         return this;
     }
     
-    public HashTranslatorsRegistry registerDefault(Translator translator){
-        defaultTranslator = translator;
-        return this;
-    }
-    
     @Override
-    public Translator translator(Culture culture) {
+    public @NotNullable Translator translator(@Nullable Culture culture) {
+        if (culture == null){
+            return defaultTranslator;
+        }
         return mappings.computeValueIfAbsent(culture, k -> translator());
     }
     
     @Override
-    public Translator translator() {
+    public @NotNullable Translator translator() {
         return defaultTranslator;
     }
 }

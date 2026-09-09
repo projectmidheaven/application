@@ -1,8 +1,6 @@
 package org.midheaven.application.context;
 
-import org.midheaven.application.security.Subject;
 import org.midheaven.application.security.SubjectResolver;
-import org.midheaven.culture.Culture;
 import org.midheaven.culture.CultureResolver;
 
 import java.time.Clock;
@@ -45,6 +43,3 @@ public final class ActualCallService implements CallService {
     }
 }
 
-record CurrentCallContext(LocalDateTime timestamp, Culture culture, Subject subject) implements CallContext {
-
-}

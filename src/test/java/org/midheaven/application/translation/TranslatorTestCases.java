@@ -12,8 +12,7 @@ public class TranslatorTestCases {
             .register("messages.name", "Hello, {0}");
         ;
         
-   TranslatorsRegistry translatorsRegistry = new HashTranslatorsRegistry()
-           .registerDefault(translator);
+   TranslatorsRegistry translatorsRegistry = new HashTranslatorsRegistry(translator);
     
     @Test
     public void invariantReturnsItsText(){

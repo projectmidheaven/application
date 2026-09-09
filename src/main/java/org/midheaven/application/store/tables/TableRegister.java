@@ -6,7 +6,7 @@ public interface TableRegister {
     
     TableRegister register(TableMetadata tableMetadata);
 
-    TableMetadata tableOf(String name);
+    TableMetadata tableOf(String logicName);
     
     Collection<TableMetadata> all();
 }

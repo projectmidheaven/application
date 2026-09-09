@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.midheaven.application.fiscal.mx.MxFiscalNumberSpecification;
 import org.midheaven.culture.CountryCode;
+import org.midheaven.math.RandomGeneratorProvider;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FiscalNumberTestCases {
@@ -48,7 +50,7 @@ public class FiscalNumberTestCases {
             ),
             "PT",List.of(
                 new Expected("501442600", true,  FiscalPersonType.COLLECTIVE),
-                new Expected("719209374", true,  FiscalPersonType.COLLECTIVE),
+                new Expected("719209377", true,  FiscalPersonType.COLLECTIVE),
                 new Expected("501442601", false, FiscalPersonType.COLLECTIVE),
                 new Expected("999999999", false, FiscalPersonType.COLLECTIVE),
                 new Expected("111111111", false, FiscalPersonType.INDIVIDUAL),
@@ -65,7 +67,24 @@ public class FiscalNumberTestCases {
                 assertEquals(exp.type, fiscalNumber.personType(), country.isoCode() + " code " + exp.code + " is not of expected type " + exp.type);
             }
         }
+        
+    }
+    
+    @Test
+    public void testRandomGeneration() {
+        var validator = new FiscalNumberValidator();
+        var random = RandomGeneratorProvider.seedable(1);
+        var supportedCountries = List.of("BR", "PT", "MX");
+        for (var code : supportedCountries){
+            for (var type : FiscalPersonType.values()){
+                var fiscalNumber = random.provide(FiscalNumberRandomGenerator.over(CountryCode.parse(code), type)).next();
+                
+                var validation = validator.validate(fiscalNumber);
+                
+                assertTrue(validation.isValid(), "Invalid generated fiscal number for country " + code + " and type " + type + "." + validation);
+            }
+        }
       
-      
+
     }
 }

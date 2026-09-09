@@ -7,11 +7,14 @@ import org.midheaven.culture.CountryCode;
 import org.midheaven.lang.Maybe;
 import org.midheaven.lang.ParsingException;
 import org.midheaven.lang.Strings;
+import org.midheaven.math.AvailableRandomGenerators;
 import org.midheaven.validation.InvalidationReason;
 import org.midheaven.validation.Validation;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class PtFiscalNumberSpecification implements FiscalNumberSpecification {
     
@@ -22,6 +25,7 @@ public class PtFiscalNumberSpecification implements FiscalNumberSpecification {
     private static final Set<String> INDIVIDUAL_PREFIXES = Set.of("1", "2", "3" , "4");
     
     private static final Pattern DIGITS_ONLY = Pattern.compile("[0-9]+");
+    private static final int[] WEIGHTS = new int[]{9, 8, 7, 6, 5, 4, 3, 2};
     
     @Override
     public FiscalNumber parse(String code, CountryCode countryCode) {
@@ -62,17 +66,41 @@ public class PtFiscalNumberSpecification implements FiscalNumberSpecification {
         return Validation.valid();
     }
     
+    @Override
+    public FiscalNumber generate(CountryCode countryCode, FiscalPersonType type, AvailableRandomGenerators randomGenerators) {
+        
+        int[] digits = randomGenerators.integers().between(0,9).stream().limit(8).mapToInt(i -> i).toArray();
+        
+        if (type == FiscalPersonType.COLLECTIVE){
+            digits[0] = 5;
+        } else {
+            digits[0] = 1;
+        }
+        return new PtFiscalNumber(Arrays.stream(digits)
+                                      .mapToObj(Integer::toString)
+                                      .collect(Collectors.joining()) + verificationDigit(digits), type);
+    }
+    
     private boolean isValidChecksum(FiscalNumber fiscalNumber) {
-        int[] weights = new int[]{9, 8, 7, 6, 5, 4, 3, 2};
-        var digits = equivalentDigits(fiscalNumber);
+  
+        var digits = equivalentDigits(fiscalNumber.code());
         if (digits[0] == 8){
             return false; // discontinued
         }
-        return checkDigits(digits, weights);
+        return checkDigits(digits);
     }
     
-    private boolean checkDigits(int[] digits, int[] weights) {
-        if (weights.length + 1 != digits.length) {
+    private int verificationDigit(int[] digits){
+        int sum = 0;
+        for (int i = 0; i < WEIGHTS.length - 1; i++) {
+            sum += digits[i] * WEIGHTS[i];
+        }
+        
+        return mod11(sum);
+    }
+    
+    private boolean checkDigits(int[] digits) {
+        if (WEIGHTS.length + 1 != digits.length) {
             return false;
         }
         
@@ -85,17 +113,7 @@ public class PtFiscalNumberSpecification implements FiscalNumberSpecification {
             return false;
         }
         
-        int sum = 0;
-        for (int i = 0; i < digits.length - 1; i++) {
-            sum += digits[i] * weights[i];
-        }
-        
-        int verificationDigit = mod11(sum);
-        if (digits[digits.length - 1] != verificationDigit){
-            return false;
-        }
-        
-        return true;
+        return digits[digits.length - 1] == verificationDigit(digits);
     }
     
     private int mod11(int sum) {
@@ -106,10 +124,10 @@ public class PtFiscalNumberSpecification implements FiscalNumberSpecification {
         return 11 - div;
     }
     
-    private int[] equivalentDigits(FiscalNumber fiscalNumber) {
-        int[] digits = new int[fiscalNumber.code().length()];
+    private int[] equivalentDigits(String fiscalNumberCode) {
+        int[] digits = new int[fiscalNumberCode.length()];
         int index = 0;
-        for (char c : fiscalNumber.code().toCharArray()) {
+        for (char c : fiscalNumberCode.toCharArray()) {
             digits[index++] = Character.digit(c, 10);
         }
         return digits;

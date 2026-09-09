@@ -15,6 +15,8 @@ public interface ColumnMetadata {
     boolean isPrimary();
     boolean isUnique();
     boolean isNeverAbsentAfterSet();
+    Maybe<String> referesTo();
+    
     @NotNullable
     Maybe<Integer> maxLength();
     @NotNullable

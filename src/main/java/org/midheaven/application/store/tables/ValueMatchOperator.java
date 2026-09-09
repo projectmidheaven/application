@@ -8,10 +8,16 @@ public class ValueMatchOperator {
     public static final ValueMatchOperator ENDS_WITH_TEXT = new ValueMatchOperator(ValueMatchOperation.ENDS_WITH_TEXT, false);
     public static final ValueMatchOperator STARTS_WITH_TEXT = new ValueMatchOperator(ValueMatchOperation.STARTS_WITH_TEXT, false);
     public static final ValueMatchOperator IN = new ValueMatchOperator(ValueMatchOperation.IN, false);
-    public static final ValueMatchOperator LESS_THAN = new ValueMatchOperator(ValueMatchOperation.LESS_THAN, false);;
-    public static final ValueMatchOperator LESS_THAN_OR_EQUAL = new ValueMatchOperator(ValueMatchOperation.LESS_THAN_OR_EQUAL, false);;
-    public static final ValueMatchOperator GREATER_THAN = new ValueMatchOperator(ValueMatchOperation.GREATER_THAN, false);;
-    public static final ValueMatchOperator GREATER_THAN_OR_EQUAL = new ValueMatchOperator(ValueMatchOperation.GREATER_THAN_OR_EQUAL, false);;
+    public static final ValueMatchOperator LESS_THAN = new ValueMatchOperator(ValueMatchOperation.LESS_THAN, false);
+    public static final ValueMatchOperator LESS_THAN_OR_EQUAL = new ValueMatchOperator(ValueMatchOperation.LESS_THAN_OR_EQUAL, false);
+    public static final ValueMatchOperator GREATER_THAN = new ValueMatchOperator(ValueMatchOperation.GREATER_THAN, false);
+    public static final ValueMatchOperator GREATER_THAN_OR_EQUAL = new ValueMatchOperator(ValueMatchOperation.GREATER_THAN_OR_EQUAL, false);
+    public static final ValueMatchOperator IN_INTERVAL = new ValueMatchOperator(ValueMatchOperation.IN_INTERVAL, false);
+    public static final ValueMatchOperator LESS_THAN_OR_NULL = new ValueMatchOperator(ValueMatchOperation.NULL_OR_LESS_THAN, false);
+    public static final ValueMatchOperator LESS_THAN_OR_EQUAL_OR_NULL = new ValueMatchOperator(ValueMatchOperation.NULL_OR_LESS_THAN_OR_EQUAL, false);
+    public static final ValueMatchOperator GREATER_THAN_OR_NULL = new ValueMatchOperator(ValueMatchOperation.NULL_OR_GREATER_THAN, false);
+    public static final ValueMatchOperator GREATER_THAN_OR_EQUAL_OR_NULL = new ValueMatchOperator(ValueMatchOperation.NULL_OR_GREATER_THAN_OR_EQUAL, false);
+    public static final ValueMatchOperator IN_INTERVAL_OR_NULL = new ValueMatchOperator(ValueMatchOperation.NULL_OR_IN_INTERVAL, false);
     
     private final boolean isNegated;
     private final ValueMatchOperation operation;
